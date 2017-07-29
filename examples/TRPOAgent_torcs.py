@@ -16,17 +16,18 @@
 """
 Quick start example.
 """
-
+from tensorforce.core.networks import from_json
 from tensorforce import Configuration
-from tensorforce.agents import TRPOAgent
+from tensorforce.agents import TRPOAgent,PPOAgent
 from tensorforce.environments.openai_gym import OpenAIGym
 from tensorforce.execution import Runner
 from tensorforce.core.networks import layered_network_builder
+from gym_torcs import GymTorcsEnv
 
 import numpy as np
 
 # Create an OpenAIgym environment
-env = OpenAIGym('CartPole-v0')
+env = GymTorcsEnv()
 
 # Create a Trust Region Policy Optimization agent
 agent = TRPOAgent(config=Configuration(
@@ -54,7 +55,7 @@ agent = TRPOAgent(config=Configuration(
 ))
 
 # Create the runner
-runner = Runner(agent=agent, environment=env,render=True)
+runner = Runner(agent=agent, environment=env)
 
 
 # Callback function printing episode statistics

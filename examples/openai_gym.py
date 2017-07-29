@@ -25,11 +25,11 @@ import argparse
 import logging
 import os
 
-from tensorforce import Configuration
-from tensorforce.agents import agents
+from tensorforce import Configuration, TensorForceError
 from tensorforce.core.networks import from_json
+from tensorforce.agents import agents
+from tensorforce.environments.openai_gym import OpenAIGym
 from tensorforce.execution import Runner
-from tensorforce.contrib.openai_gym import OpenAIGym
 
 
 def main():
@@ -52,7 +52,7 @@ def main():
     args = parser.parse_args()
 
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)  # configurable!!!
 
     environment = OpenAIGym(args.gym_id, monitor=args.monitor, monitor_safe=args.monitor_safe, monitor_video=args.monitor_video)
 
@@ -61,7 +61,6 @@ def main():
     else:
         agent_config = Configuration()
         logger.info("No agent configuration provided.")
-
     if args.network_config:
         network = from_json(args.network_config)
     else:
@@ -94,7 +93,9 @@ def main():
         environment=environment,
         repeat_actions=1,
         save_path=args.save,
-        save_episodes=args.save_episodes
+        save_episodes=args.save_episodes,
+        render=True,
+
     )
 
     report_episodes = args.episodes // 1000

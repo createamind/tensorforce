@@ -16,45 +16,62 @@
 """
 Quick start example.
 """
-
+from tensorforce.core.networks import from_json
 from tensorforce import Configuration
-from tensorforce.agents import TRPOAgent
+from tensorforce.agents import TRPOAgent,PPOAgent
 from tensorforce.environments.openai_gym import OpenAIGym
 from tensorforce.execution import Runner
 from tensorforce.core.networks import layered_network_builder
+from gym_torcs import GymTorcsEnv
 
 import numpy as np
 
 # Create an OpenAIgym environment
-env = OpenAIGym('CartPole-v0')
+env = GymTorcsEnv()
 
 # Create a Trust Region Policy Optimization agent
-agent = TRPOAgent(config=Configuration(
-    loglevel='info',
-    batch_size=100,
-    baseline=dict(
-        type='mlp',
-        size=32,
-        repeat_update=100
-    ),
-    generalized_advantage_estimation=True,
-    normalize_advantage=False,
-    gae_lambda=0.97,
-    override_line_search=False,
-    cg_iterations=20,
-    cg_damping=0.01,
-    line_search_steps=20,
-    max_kl_divergence=0.005,
-    states=env.states,
-    actions=env.actions,
-    network=layered_network_builder([
-        dict(type='dense', size=32, activation='tanh'),
-        dict(type='dense', size=32, activation='tanh')
-    ])
-))
+
+agent_config = Configuration.from_json('configs/ppo_cartpole.json' )
+
+network = from_json('configs/trpo_network.json')
+agent_config.default(dict(states=env.states, actions=env.actions, network=network))
+agent = PPOAgent(config=agent_config)
+
+
+
+
+# agent = PPOAgent(config=Configuration(
+#     loglevel='info',
+#     batch_size=100,
+#     baseline=dict(
+#         type='mlp',
+#         size=32,
+#         repeat_update=100
+#     ),
+#     generalized_advantage_estimation=True,
+#     normalize_advantage=False,
+#     gae_lambda=0.97,
+#     override_line_search=False,
+#     cg_iterations=20,
+#     cg_damping=0.01,
+#     line_search_steps=20,
+#     max_kl_divergence=0.005,
+#     states=env.states,
+#     actions=env.actions,
+
+
+
+
+
+
+#     network=layered_network_builder([
+#         dict(type='dense', size=32, activation='tanh'),
+#         dict(type='dense', size=32, activation='tanh')
+#     ])
+# ))
 
 # Create the runner
-runner = Runner(agent=agent, environment=env,render=True)
+runner = Runner(agent=agent, environment=env)
 
 
 # Callback function printing episode statistics
@@ -65,7 +82,7 @@ def episode_finished(r):
 
 
 # Start learning
-runner.run(episodes=3000, max_timesteps=200, episode_finished=episode_finished)
+runner.run(episodes=3000, max_timesteps=100000, episode_finished=episode_finished)
 
 # Print statistics
 print("Learning finished. Total episodes: {ep}. Average reward of last 100 episodes: {ar}.".format(ep=runner.episode,

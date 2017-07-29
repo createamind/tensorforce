@@ -33,7 +33,7 @@ class Runner(object):
     # These agents can be used in an A3C fashion
     async_supported = ('VPGAgent', 'DQNAgent', 'NAFAgent')
 
-    def __init__(self, agent, environment, repeat_actions=1, cluster_spec=None, task_index=None, save_path=None, save_episodes=None):
+    def __init__(self, agent, environment, repeat_actions=1, cluster_spec=None, task_index=None, save_path=None, save_episodes=None,render=False):
         """
         Initialize a Runner object.
 
@@ -55,6 +55,7 @@ class Runner(object):
         self.task_index = task_index
         self.save_path = save_path
         self.save_episodes = save_episodes
+        self.render=render
 
     def run(self, episodes=-1, max_timesteps=-1, episode_finished=None):
         """
@@ -129,6 +130,8 @@ class Runner(object):
 
             self.timestep = 0
             while True:
+                if self.render:
+                    self.environment.gym.render()
                 action = self.agent.act(state=state)
                 if self.repeat_actions > 1:
                     reward = 0
