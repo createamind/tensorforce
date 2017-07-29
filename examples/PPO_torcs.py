@@ -52,14 +52,14 @@ def main():
     parser.add_argument('-se', '--save-episodes', type=int, default=100, help="Save agent every x episodes")
     parser.add_argument('-l', '--load', help="Load agent from this dir")
     parser.add_argument('-D', '--debug', action='store_true', default=True, help="Show debug outputs")
-
+    parser.add_argument('-p', '--port', type=int, default=3202, help="Show debug outputs")
     args = parser.parse_args()
 
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)  # configurable!!!
 
     #environment = OpenAIGym(args.gym_id, monitor=args.monitor, monitor_safe=args.monitor_safe, monitor_video=args.monitor_video)
-    env = GymTorcsEnv()
+    env = GymTorcsEnv(port=args.port)
 
     if args.agent_config:
         agent_config = Configuration.from_json(args.agent_config)
@@ -78,12 +78,13 @@ def main():
     #agent = agents[args.agent](config=agent_config)
     agent = PPOAgent(config=agent_config)
 
-    #args.load = './model/'
+    args.load = './model/'
     if args.load:
         load_dir = os.path.dirname(args.load)
         if not os.path.isdir(load_dir):
             raise OSError("Could not load agent from {}: No such directory.".format(load_dir))
         agent.load_model(args.load)
+        logger.info("------------------------------------------------------model loaded !! --------------------------------")
 
     if args.debug:
         logger.info("-" * 16)
