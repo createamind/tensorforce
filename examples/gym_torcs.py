@@ -13,7 +13,7 @@ import signal
 
 
 class TorcsEnv:
-    terminal_judge_start = 100  # Speed limit is applied after this step
+    terminal_judge_start = 60  # Speed limit is applied after this step
     termination_limit_progress = 5  # [km/h], episode terminates if car is running slower than this limit
     default_speed = 50
 
