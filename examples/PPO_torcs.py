@@ -39,7 +39,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('gym_id', help="ID of the gym environment")
+    parser.add_argument('-gym_id', help="ID of the gym environment")
     parser.add_argument('-a', '--agent', help='Agent')
     parser.add_argument('-c', '--agent-config', help="Agent configuration file")
     parser.add_argument('-n', '--network-config', help="Network configuration file")
@@ -70,7 +70,7 @@ def main():
     if args.network_config:
         network = from_json(args.network_config)
     else:
-        network = from_json('configs/trpo_network.json')
+        network = from_json('configs/ppo_network.json')
         #network = None
         #logger.info("No network configuration provided.")
     agent_config.default(dict(states=env.states, actions=env.actions, network=network))
@@ -78,7 +78,7 @@ def main():
     #agent = agents[args.agent](config=agent_config)
     agent = PPOAgent(config=agent_config)
 
-    args.load = './model/'
+    #args.load = './model2/'
     if args.load:
         load_dir = os.path.dirname(args.load)
         if not os.path.isdir(load_dir):
@@ -91,7 +91,7 @@ def main():
         logger.info("Configuration:")
         logger.info(agent_config)
 
-    args.save = './model/'
+    args.save = './model2/'
     if args.save:
         save_dir = os.path.dirname(args.save)
         if not os.path.isdir(save_dir):
@@ -120,7 +120,7 @@ def main():
             logger.info("Episode reward: {}".format(r.episode_rewards[-1]))
             logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
             logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
-        if np.mod(r.episode, 29) == 0:
+        if np.mod(r.episode, 59) == 0:
             env.reset(relaunch=True)
         return True
 

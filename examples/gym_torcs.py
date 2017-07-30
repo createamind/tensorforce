@@ -13,8 +13,8 @@ import signal
 
 
 class TorcsEnv:
-    terminal_judge_start = 60  # Speed limit is applied after this step
-    termination_limit_progress = 5  # [km/h], episode terminates if car is running slower than this limit
+    terminal_judge_start = 30  # Speed limit is applied after this step
+    termination_limit_progress = 15  # [km/h], episode terminates if car is running slower than this limit
     default_speed = 50
 
     initial_reset = True
@@ -274,7 +274,7 @@ class TorcsEnv:
             brake = u[2]
 
         torcs_action = {'steer': u[0], 'accel': accel, 'brake': brake}
-
+        print(torcs_action)
         return torcs_action
 
 
@@ -344,7 +344,7 @@ class GymTorcsEnv(TorcsEnv):
     def __init__(self, vision=False, throttle=False, gear_change=False, port=3101):
         super(GymTorcsEnv,self).__init__(vision,throttle,gear_change,port )
         self.states={'num_actions':29,'type':'float','shape':(29,)}
-        self.actions={ 'continuous':True,'shape':(2,),'type':'float'}
+        self.actions={ 'continuous':True,'shape':(3,),'type':'float'}
 
 
 

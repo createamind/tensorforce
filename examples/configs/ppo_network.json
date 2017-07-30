@@ -1,0 +1,18 @@
+[
+    {
+        "type": "dense",
+        "size": 640,
+        "activation": "tanh"
+    },
+    {
+        "type": "dense",
+        "size": 640,
+        "activation": "tanh"
+    },
+    {
+        "type": "dense",
+        "size": 640,
+        "activation": "tanh"
+    }
+
+]
