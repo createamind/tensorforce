@@ -37,6 +37,8 @@ class Gaussian(Distribution):
         self.shape = shape
         self.mean = mean
         self.log_stddev = log_stddev
+        self.min_value=min_value
+        self.max_value=max_value
 
     @classmethod
     def from_tensors(cls, parameters, deterministic):
@@ -52,6 +54,7 @@ class Gaussian(Distribution):
         else:
             bias = self.mean
         self.mean = layers['linear'](x=x, size=flat_size, bias=bias, weights=0.)
+        self.mean=tf.clip_by_value(self.mean,self.min_value,self.max_value  )
         self.mean = tf.reshape(tensor=self.mean, shape=((-1,) + self.shape))
         # self.mean = tf.squeeze(input=self.mean, axis=1)
         if isinstance(self.log_stddev, float):
@@ -59,6 +62,7 @@ class Gaussian(Distribution):
         else:
             bias = self.log_stddev
         self.log_stddev = layers['linear'](x=x, size=flat_size, bias=bias)
+        self.log_stddev=tf.clip_by_value(self.log_stddev,[0.05]*flat_size,[0.2]*flat_size)
         self.log_stddev = tf.reshape(tensor=self.log_stddev, shape=((-1,) + self.shape))
         # self.log_stddev = tf.squeeze(input=self.log_stddev, axis=1)
         self.log_stddev = tf.minimum(x=self.log_stddev, y=10.0)  # prevent infinity when exp
@@ -66,9 +70,11 @@ class Gaussian(Distribution):
         self.deterministic = deterministic
 
     def sample(self):
+        flat_size = util.prod(self.shape)
         deterministic = self.mean
         stddev = tf.exp(x=self.log_stddev)
         sampled = self.mean + stddev * tf.random_normal(shape=tf.shape(self.mean))
+        sampled=tf.clip_by_value(sampled,[-1.]*flat_size,[1.]*flat_size)
         return tf.where(condition=self.deterministic, x=deterministic, y=sampled)
 
     def log_probability(self, action):

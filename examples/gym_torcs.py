@@ -10,7 +10,7 @@ import os
 import subprocess
 import time
 import signal
-from tensorforce/contrib/openai_gym.py import OpenAIGym
+from tensorforce.contrib.openai_gym import OpenAIGym
 
 class TorcsEnv:
     terminal_judge_start = 30  # Speed limit is applied after this step
@@ -61,7 +61,7 @@ class TorcsEnv:
         obs = client.S.d  # Get the current full-observation from torcs
         """
         if throttle is False:
-            self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(1,))
+            self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(3,))
         else:
             self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,))
 
@@ -274,6 +274,7 @@ class TorcsEnv:
             brake = u[2]
 
         torcs_action = {'steer': u[0], 'accel': accel, 'brake': brake}
+        print(u)
         print(torcs_action)
         return torcs_action
 
@@ -356,6 +357,51 @@ class GymTorcsEnv(TorcsEnv):
     def states(self):
         return {'type':'float','shape':(29,)}
 
+    # @property
+    # def actions(self):
+    #     return OpenAIGym.action_from_space(space=self.action_space)
+
+
     @property
     def actions(self):
-        return OpenAIGym.action_from_space(space=self.action_space)
+        return GymTorcsEnv.action_from_space(space=self.action_space)
+
+    @staticmethod
+    def action_from_space(space):
+        if isinstance(space, gym.spaces.Discrete):
+            return dict(continuous=False, num_actions=space.n)
+        elif isinstance(space, gym.spaces.MultiBinary):
+            return dict(continuous=False, num_actions=2, shape=space.n)
+        elif isinstance(space, gym.spaces.MultiDiscrete):
+            if (space.low == space.low[0]).all() and (space.high == space.high[0]).all():
+                return dict(continuous=False, num_actions=(space.high[0] - space.low[0]), shape=space.num_discrete_space)
+            else:
+                actions = dict()
+                for n in range(space.num_discrete_space):
+                    actions['action{}'.format(n)] = dict(continuous=False, num_actions=(space.high[n] - space.low[n]))
+                return actions
+        elif isinstance(space, gym.spaces.Box):
+            if (space.low == space.low[0]).all() and (space.high == space.high[0]).all():
+                return dict(continuous=True, shape=space.low.shape, min_value=space.low[0], max_value=space.high[0])
+            else:
+                actions = dict()
+                low = space.low.flatten()
+                high = space.high.flatten()
+                for n in range(low.shape[0]):
+                    actions['action{}'.format(n)] = dict(continuous=True, min_value=low[n], max_value=high[n])
+                return actions
+        elif isinstance(space, gym.spaces.Tuple):
+            actions = dict()
+            n = 0
+            for space in space.spaces:
+                action = OpenAIGym.action_from_space(space=space)
+                if 'continuous' in action:
+                    actions['action{}'.format(n)] = action
+                    n += 1
+                else:
+                    for action in action.values():
+                        actions['action{}'.format(n)] = action
+                        n += 1
+            return actions
+        else:
+            raise TensorForceError('Unknown Gym space.')
