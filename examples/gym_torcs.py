@@ -63,7 +63,7 @@ class TorcsEnv:
         if throttle is False:
             self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(3,))
         else:
-            self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,))
+            self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(4,))
 
         if vision is False:
             high = np.array([1., np.inf, np.inf, np.inf, 1., np.inf, 1., np.inf])
@@ -264,18 +264,21 @@ class TorcsEnv:
         accel = 0
         brake = 0
 
-        if len(u)==2:
-            if u[1] >= 0:
-                accel = u[1]
-            else:
-                brake = u[1]
+        #if len(u)==2:
+        #    if u[1] >= 0:
+        #        accel = u[1]
+        #    else:
+        #        brake = u[1]
         if len(u)==3:
             accel = u[1]
             brake = u[2]
 
         torcs_action = {'steer': u[0], 'accel': accel, 'brake': brake}
-        print(u)
-        print(torcs_action)
+                
+        if self.time_step % 27 == 0 :
+            print(torcs_action) 
+            print(self.time_step)
+
         return torcs_action
 
 
