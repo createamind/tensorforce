@@ -10,7 +10,7 @@ import os
 import subprocess
 import time
 import signal
-
+from tensorforce/contrib/openai_gym.py import OpenAIGym
 
 class TorcsEnv:
     terminal_judge_start = 30  # Speed limit is applied after this step
@@ -343,18 +343,19 @@ class TorcsEnv:
 class GymTorcsEnv(TorcsEnv):
     def __init__(self, vision=False, throttle=False, gear_change=False, port=3101):
         super(GymTorcsEnv,self).__init__(vision,throttle,gear_change,port )
-        self.states={'num_actions':29,'type':'float','shape':(29,)}
-        self.actions={ 'continuous':True,'shape':(3,),'type':'float'}
-
-
+        #self.states={'num_actions':29,'type':'float','shape':(29,)}
+        #self.actions={ 'continuous':True,'shape':(3,),'type':'float'}
 
     def execute(self,action):
         _,reward,_,_=self.step(action)
         ob=self.get_obs()
         states= np.hstack((ob.angle, ob.track, ob.trackPos, ob.speedX, ob.speedY,  ob.speedZ, ob.wheelSpinVel/100.0, ob.rpm))
-        # print('sss'*10+'\n')
-        # print(states )
-
         return  states, reward, self.client.R.d['meta']
 
+    @property
+    def states(self):
+        return {'type':'float','shape':(29,)}
 
+    @property
+    def actions(self):
+        return OpenAIGym.action_from_space(space=self.action_space)
