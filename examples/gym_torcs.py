@@ -31,7 +31,7 @@ class TorcsEnv:
             command += ' -vision'
         time.sleep(np.random.ranf([1])*3)
         self.torcs_proc = subprocess.Popen(command, shell=False, preexec_fn=os.setsid)
-        time.sleep(0.5)
+        time.sleep(1.5)
         os.system('sh autostart.sh {}'.format(window_title))
         time.sleep(0.5)
 

@@ -78,7 +78,7 @@ def main():
     #agent = agents[args.agent](config=agent_config)
     agent = PPOAgent(config=agent_config)
 
-    #args.load = './model2/'
+    #args.load = './model/'
     if args.load:
         load_dir = os.path.dirname(args.load)
         if not os.path.isdir(load_dir):
@@ -91,7 +91,7 @@ def main():
         logger.info("Configuration:")
         logger.info(agent_config)
 
-    args.save = './model2/'
+    #args.save = './model/'
     if args.save:
         save_dir = os.path.dirname(args.save)
         if not os.path.isdir(save_dir):
