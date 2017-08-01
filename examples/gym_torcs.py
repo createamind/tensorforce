@@ -13,8 +13,8 @@ import signal
 from tensorforce.contrib.openai_gym import OpenAIGym
 
 class TorcsEnv:
-    terminal_judge_start = 30  # Speed limit is applied after this step
-    termination_limit_progress = 15  # [km/h], episode terminates if car is running slower than this limit
+    terminal_judge_start = 7  # Speed limit is applied after this step
+    termination_limit_progress = 5  # [km/h], episode terminates if car is running slower than this limit
     default_speed = 50
 
     initial_reset = True
@@ -172,11 +172,11 @@ class TorcsEnv:
 
         if self.terminal_judge_start < self.time_step: # Episode terminates if the progress of agent is small
            if progress < self.termination_limit_progress:
-               if self.time_step >  20 :
-                    print("--- No progress restart : reward: {},x:{},angle:{},trackPos:{}".format(progress,sp,obs['angle'],obs['trackPos']))
-                    print(self.time_step)
-                    episode_terminate = True
-                    client.R.d['meta'] = True
+               #if self.time_step >  20 :
+                print("--- No progress restart : reward: {},x:{},angle:{},trackPos:{}".format(progress,sp,obs['angle'],obs['trackPos']))
+                print(self.time_step)
+                episode_terminate = True
+                client.R.d['meta'] = True
 
         if np.cos(obs['angle']) < 0:  # Episode is terminated if the agent runs backward
             if self.time_step >  20 :
@@ -270,8 +270,8 @@ class TorcsEnv:
         #    else:
         #        brake = u[1]
         if len(u)==3:
-            accel = u[1]
-            brake = u[2]
+            accel = np.abs(u[1])
+            brake = np.abs(u[2])
 
         torcs_action = {'steer': u[0], 'accel': accel, 'brake': brake}
                 
