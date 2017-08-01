@@ -27,7 +27,8 @@ import os
 from tensorforce import Configuration, TensorForceError
 from tensorforce.core.networks import from_json
 
-from tensorforce.agents import agents, TRPOAgent,PPOAgent
+from tensorforce.agents import agents, TRPOAgent
+from tensorforce.agents.ppo_agent_noise import PPOAgent
 #from tensorforce.environments.openai_gym import OpenAIGym
 from tensorforce.execution import Runner
 from tensorforce.core.networks import layered_network_builder

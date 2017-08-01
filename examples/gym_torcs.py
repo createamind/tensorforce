@@ -153,6 +153,9 @@ class TorcsEnv:
         progress = sp*np.cos(obs['angle']) #- np.abs(sp*np.sin(obs['angle'])) - sp * np.abs(obs['trackPos'])
         reward = progress
 
+        if self.time_step % 5 == 0 :
+            print(progress) 
+
         # collision detection
         if obs['damage'] - obs_pre['damage'] > 0:
             reward = -1
@@ -276,8 +279,10 @@ class TorcsEnv:
         torcs_action = {'steer': u[0], 'accel': accel, 'brake': brake}
                 
         if self.time_step % 5 == 0 :
-            print(torcs_action) 
+            print('------------------------------------------------------------')
             print(self.time_step)
+            print(torcs_action) 
+            
 
         return torcs_action
 
