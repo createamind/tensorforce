@@ -13,8 +13,8 @@ import signal
 from tensorforce.contrib.openai_gym import OpenAIGym
 
 class TorcsEnv:
-    terminal_judge_start = 7  # Speed limit is applied after this step
-    termination_limit_progress = 5  # [km/h], episode terminates if car is running slower than this limit
+    terminal_judge_start = 10  # Speed limit is applied after this step
+    termination_limit_progress = 10  # [km/h], episode terminates if car is running slower than this limit
     default_speed = 50
 
     initial_reset = True
@@ -150,7 +150,7 @@ class TorcsEnv:
         damage = np.array(obs['damage'])
         rpm = np.array(obs['rpm'])
 
-        progress = sp*np.cos(obs['angle']) - np.abs(sp*np.sin(obs['angle'])) - sp * np.abs(obs['trackPos'])
+        progress = sp*np.cos(obs['angle']) #- np.abs(sp*np.sin(obs['angle'])) - sp * np.abs(obs['trackPos'])
         reward = progress
 
         # collision detection
@@ -173,7 +173,7 @@ class TorcsEnv:
         if self.terminal_judge_start < self.time_step: # Episode terminates if the progress of agent is small
            if progress < self.termination_limit_progress:
                #if self.time_step >  20 :
-                print("--- No progress restart : reward: {},x:{},angle:{},trackPos:{}".format(progress,sp,obs['angle'],obs['trackPos']))
+                print("--- No progress restart : reward: {},x:{},angle:{},trackPos:{}".format(progress,sp,'nouse','nouse'))
                 print(self.time_step)
                 episode_terminate = True
                 client.R.d['meta'] = True
@@ -275,7 +275,7 @@ class TorcsEnv:
 
         torcs_action = {'steer': u[0], 'accel': accel, 'brake': brake}
                 
-        if self.time_step % 27 == 0 :
+        if self.time_step % 5 == 0 :
             print(torcs_action) 
             print(self.time_step)
 
